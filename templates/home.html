@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block main %}
+
+<div class="container-fluid image-intro px-4 text-center">
+    <div class="row">
+        <div class="col image-intro">
+            <h2>Harvard-Yale Predictions</h2>
+            <p>Bet on Harvard-Yale</p>
+        </div>
+        <div class="col image-intro">
+            <img src="./static/harvardFootball.jpg" class="smooth-image" alt="harvard-football">
+        </div>
+        {% for user in data %}
+        <div class='post'>
+            <p>{{ user['created'] }}</p>
+            <p>{{ user['username'] }}
+            <p>
+            <p>{{ user['password'] }}</p>
+            <p>{{ user['cash'] }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

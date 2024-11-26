@@ -1,0 +1,32 @@
+/* Size for brand */
+nav .navbar-brand
+{
+    font-size: xx-large;
+}
+
+/* Overriding container-fluid to make page more immersive and get rid of margins */
+.container-fluid {
+    width:100%;
+    max-width:none;
+    padding-left:0;
+    padding-right:0
+}
+
+/* Styles for navigation bar and image intro */
+.navigation-bar {
+    background-color: #2d2d2d;
+    color: #f9f9f9;
+}
+
+.image-intro {
+    background-color: #000000;
+    color: #f9f9f9;
+    padding: 5px;
+}
+
+.smooth-image {
+    border-radius: 10%;
+    padding: 10px;
+    width: 800px;
+    height: auto;
+}
