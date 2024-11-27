@@ -1,9 +1,3 @@
-/* Size for brand */
-nav .navbar-brand
-{
-    font-size: xx-large;
-}
-
 /* Overriding container-fluid to make page more immersive and get rid of margins */
 .container-fluid {
     width:100%;
@@ -14,12 +8,12 @@ nav .navbar-brand
 
 /* Styles for navigation bar and image intro */
 .navigation-bar {
-    background-color: #2d2d2d;
+    background-color: #450000;
     color: #f9f9f9;
 }
 
 .image-intro {
-    background-color: #000000;
+    background-color: #300000;
     color: #f9f9f9;
     padding: 5px;
 }
@@ -29,4 +23,16 @@ nav .navbar-brand
     padding: 10px;
     width: 800px;
     height: auto;
+}
+
+/* Styles for login and registration */
+.login-register {
+    background-color: #3c0000;
+    color: #f9f9f9;
+    height: 100%;
+}
+
+.fill {
+    min-height: 100vh;
+    height: 100%;
 }

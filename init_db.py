@@ -1,5 +1,6 @@
 import sqlite3
 
+# Can also use this script to execute stuff on the harvard.db database
 connection = sqlite3.connect('harvard.db')
 
 with open('schema.sql') as f:
