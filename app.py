@@ -1,13 +1,19 @@
 import os
-from flask import Flask, request, redirect, render_template
+from flask import Flask, request, redirect, render_template, session, flash
 from flask_sqlalchemy import SQLAlchemy
 import sqlite3
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from helpers import apology
 
+# Configuring Flask
 app = Flask(__name__)
 app.debug = True
+app.config['SECRET_KEY'] = os.urandom(16)
+
+# Configure session to use filesystem (instead of signed cookies)
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
 
 # Connects to database
 def get_db_connection():
@@ -33,37 +39,36 @@ def index():
 def login():
     """ Login user """
 
-    return render_template("login.html")
+    # Forget any user_id
+    session.clear()
 
-    # # Forget any user_id
-    # session.clear()
+    # User reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+        # Ensure username was submitted
+        if not request.form.get("username"):
+            return apology("must provide username", 403)
+        # Ensure password was submitted
+        elif not request.form.get("password"):
+            return apology("must provide password", 403)
+        # Query database for username
+        conn = get_db_connection()
+        rows = conn.execute("SELECT * FROM users WHERE username = ?", (request.form.get("username"),)).fetchall()
+        conn.close()
 
-    # # User reached route via POST (as by submitting a form via POST)
-    # if request.method == "POST":
-    #     # Ensure username was submitted
-    #     if not request.form.get("username"):
-    #         return apology("must provide username", 403)
-    #     # Ensure password was submitted
-    #     elif not request.form.get("password"):
-    #         return apology("must provide password", 403)
-    #     # Query database for username
-    #     rows = db.execute(
-    #         "SELECT * FROM users WHERE username = ?", request.form.get("username")
-    #     )
-    #     # Ensure username exists and password is correct
-    #     if len(rows) != 1 or not check_password_hash(
-    #         rows[0]["hash"], request.form.get("password")
-    #     ):
-    #         return apology("invalid username and/or password", 403)
-    #     # Remember which user has logged in
-    #     session["user_id"] = rows[0]["id"]
+        # Ensure username exists and password is correct
+        if len(rows) != 1 or not check_password_hash(rows[0]["password"], request.form.get("password")):
+            return apology("invalid username and/or password", 403)
+        # Remember which user has logged in
+        session["user_id"] = rows[0]["id"]
 
-    #     # Redirect user to home page
-    #     return redirect("/")
+        flash('Successfully logged in!')
 
-    # # User reached route via GET (as by clicking a link or via redirect)
-    # else:
-    #     return render_template("login.html")
+        # Redirect user to home page
+        return redirect("/landing")
+
+    # User reached route via GET (as by clicking a link or via redirect)
+    else:
+        return render_template("login.html")
 
 # Render register.html page
 @app.route("/register", methods=["GET", "POST"])
@@ -109,7 +114,14 @@ def register():
 
 @app.route("/landing", methods=["GET", "POST"])
 def landing():
-    return render_template("landing.html")
+    """ Landing page for logged in user """
+
+    # Query database for username
+    conn = get_db_connection()
+    user = conn.execute("SELECT * FROM users WHERE id = ?", (session["user_id"],)).fetchall()
+    conn.close()
+    
+    return render_template("landing.html", data=user)
 
 if __name__ == '__main__':
     app.run(debug=True)

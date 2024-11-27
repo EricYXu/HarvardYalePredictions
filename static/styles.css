@@ -32,6 +32,13 @@
     height: 100%;
 }
 
+.login-register-button {
+    background-color: #ff5500;
+    border-color: #ff5500;
+    color: #fffffff6;
+    font-weight: 400;
+}
+
 .fill {
     min-height: 100vh;
     height: 100%;
