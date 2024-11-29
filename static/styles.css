@@ -6,7 +6,8 @@
     padding-right:0
 }
 
-/* Styles for navigation bar and image intro */
+/* Styles for navigation bar and image intro and body */
+
 .navigation-bar {
     background-color: #450000;
     color: #f9f9f9;
@@ -27,9 +28,10 @@
 
 /* Styles for login and registration */
 .login-register {
-    background-color: #3c0000;
+    background-color: #300000;
     color: #f9f9f9;
     height: 100%;
+    padding-top: 50px
 }
 
 .login-register-button {
@@ -42,4 +44,20 @@
 .fill {
     min-height: 100vh;
     height: 100%;
+    background-color: #300000;
+    color: #f9f9f9;
+}
+
+/* Styles for info section of home.html */
+.smooth-image-info {
+    border-radius: 10%;
+    padding: 10px;
+    width: 300px;
+    height: auto;
+}
+
+/* Styles for footer of home.html */
+
+.info-footer {
+    padding-top: 50px;
 }

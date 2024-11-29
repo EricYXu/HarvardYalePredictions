@@ -16,7 +16,7 @@
 
     <link href="/static/styles.css" rel="stylesheet">
 
-    <title> Harvard-Yale Predictions | {% block title %}{% endblock %}</title>
+    <title> Harvard-Yale Sportsbook | {% block title %}{% endblock %}</title>
 
 </head>
 
@@ -25,13 +25,13 @@
     <div class="container-fluid navigation-bar"> <!-- For the navigation bar -->
         {% if session["user_id"] %}
         <nav class="nav">
-            <a class="nav-link navigation-bar" href="/">Dashboard</a>
-            <a class="nav-link navigation-bar" href="/">Place Bets</a>
-            <a class="nav-link navigation-bar ml-auto mr-1" href="/">Log Out</a>
+            <a class="nav-link navigation-bar" href="/landing">Dashboard</a>
+            <a class="nav-link navigation-bar" href="/bet">Place Bets</a>
+            <a class="nav-link navigation-bar ml-auto mr-1" href="/logout">Log Out</a>
         </nav>
         {% else %}
         <nav class="nav">
-            <a class="nav-link active navigation-bar" href="/">Harvard-Yale Predictions</a>
+            <a class="nav-link active navigation-bar" href="/">Harvard-Yale Sportsbook</a>
             <a class="nav-link navigation-bar" href="/login">Login</a>
             <a class="nav-link navigation-bar" href="/register">Register</a>
         </nav>
@@ -50,8 +50,8 @@
         {% block main %}{% endblock %}
     </main>
 
-    <footer class="mb-5 text-center"> <!-- Footer stuff later like links -->
-        <p></p>
+    <footer class="mb-5 text-center info-footer"> <!-- Footer stuff later like links -->
+        <p>Developed for CS50 2024 Fall Final Project</p>
     </footer>
 
 </body>

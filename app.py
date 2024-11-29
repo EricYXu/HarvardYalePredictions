@@ -17,7 +17,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 
 # Connects to database
 def get_db_connection():
-    conn = sqlite3.connect('harvard.db')
+    conn = sqlite3.connect('site.db')
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -63,7 +63,7 @@ def login():
 
         flash('Successfully logged in!')
 
-        # Redirect user to home page
+        # Redirect user to home page, TODO: insert user data from SQL query here
         return redirect("/landing")
 
     # User reached route via GET (as by clicking a link or via redirect)
@@ -114,14 +114,28 @@ def register():
 
 @app.route("/landing", methods=["GET", "POST"])
 def landing():
-    """ Landing page for logged in user """
+    """ Sends logged-in user to landing dashboard """
 
     # Query database for username
     conn = get_db_connection()
-    user = conn.execute("SELECT * FROM users WHERE id = ?", (session["user_id"],)).fetchall()
+    user = conn.execute("SELECT * FROM users WHERE id = ?", (session["user_id"],)).fetchall() # TODO: There is some issue with session --> FIX
     conn.close()
     
     return render_template("landing.html", data=user)
+
+@app.route("/logout")
+def logout():
+    """ Logs user out """
+
+    # Clear session and forget user_id
+    session.clear()
+    return redirect("/")
+
+@app.route("/bet", methods=["GET", "POST"])
+def bet():
+    """ Betting dashboard for logged in user """
+
+    return render_template("bet.html")
 
 if __name__ == '__main__':
     app.run(debug=True)

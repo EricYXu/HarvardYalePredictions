@@ -9,11 +9,11 @@ Home
 <div class="container-fluid image-intro px-4 text-center">
     <div class="row">
         <div class="col image-intro">
-            <h1><b>Harvard-Yale Predictions</b></h1>
+            <h1><b>Harvard-Yale Sportsbook</b></h1>
             <h4>Your #1 spot to bet on The Game</h4>
             <div class="row">
                 <div class="col">
-                    <h3><b>{{ userCount[0][0] }}</b> avid Harvard-Yale fans</h3>
+                    <h3>Join the fun with <b>all</b> Harvard-Yale fans</h3>
                     <a class="btn btn-primary login-register-button" href="/register" role="button">Register</a>
                     <a class="btn btn-primary login-register-button" href="/login" role="button">Login</a>
                 </div>
@@ -32,6 +32,27 @@ Home
         </div>
         {% endfor %}
     </div>
+    <div class="row">
+        <div class="col image-intro">
+            <h1><b>Over [COUNT] people registered</b></h1>
+            <div class="row">
+                <div class="col">
+                    <h3>1. Safe</h3>
+                    <p>Our site is the safest and most secure location to bet on Crimson Football.</p>
+                    <img src="./static/secure.jpg" class="smooth-image-info" alt="secure">
+                </div>
+                <div class="col">
+                    <h3>2. Flexible</h3>
+                    <p>Make predictions on more than The Game. Bet on conditions, types of plays made, fan turnout, and more.</p>
+                    <img src="./static/flexible.jpg" class="smooth-image-info" alt="flexible">
+                </div>
+                <div class="col">
+                    <h3>3. Fun</h3>
+                    <p>Join the competition with friends and rivals alike!</p>
+                    <img src="./static/fun.jpg" class="smooth-image-info" alt="fun">
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-{% endblock %}
+    {% endblock %}

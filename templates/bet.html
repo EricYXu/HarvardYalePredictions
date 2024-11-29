@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-Landing
+Bet
 {% endblock %}
 
 {% block main %}
@@ -9,19 +9,13 @@ Landing
 <div class="container-fluid image-intro px-4 text-center">
     <div class="row fill">
         <div class="col image-intro">
-            <h2>Harvard-Yale Sportsbook Personal Dashboard</h2>
+            <h2>Betting Dashboard</h2>
             <p>Welcome Back, username</p>
         </div>
-        {% for user in data %}
-        <div class='post'>
-            <p>{{ user['username'] }}</p>
-            <p>${{ user['cash'] }}</p>
-        </div>
-        {% endfor %}
     </div>
     <div class="row">
         <div class="col">
-            <p>Upcoming Events</p>
+            <p>Current Live Bets</p>
         </div>
     </div>
 </div>
