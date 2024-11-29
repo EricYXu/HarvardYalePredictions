@@ -127,7 +127,7 @@ def landing():
 def logout():
     """ Logs user out """
 
-    # Clear session and forget user_id
+    # Clears session and forget user_id
     session.clear()
     return redirect("/")
 
