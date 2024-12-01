@@ -23,12 +23,11 @@ Home
             <img src="./static/harvardFootball.jpg" class="smooth-image" alt="harvard-football">
         </div>
         {% for user in data %}
-        <div class='post'>
+        <div class='row'>
             <p>{{ user['created'] }}</p>
-            <p>{{ user['username'] }}
-            <p>
+            <p>{{ user['username'] }}</p>
             <p>{{ user['password'] }}</p>
-            <p>{{ user['cash'] }}</p>
+            <p>${{ user['cash'] }}</p>
         </div>
         {% endfor %}
     </div>
@@ -43,7 +42,8 @@ Home
                 </div>
                 <div class="col">
                     <h3>2. Flexible</h3>
-                    <p>Make predictions on more than The Game. Bet on conditions, types of plays made, fan turnout, and more.</p>
+                    <p>Make predictions on more than The Game. Bet on conditions, types of plays made, fan turnout, and
+                        more.</p>
                     <img src="./static/flexible.jpg" class="smooth-image-info" alt="flexible">
                 </div>
                 <div class="col">
@@ -55,4 +55,4 @@ Home
         </div>
     </div>
 </div>
-    {% endblock %}
+{% endblock %}
