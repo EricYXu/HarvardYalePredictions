@@ -60,12 +60,15 @@ Game Statistics
                     <tbody>
                         {% for row in data %}
                         <tr>
+                            <td>{{ row['Year'] }}</td>
+                            <td>{{ row['Score'] }}</td>
+                            <td>{{ row['Winner'] }}</td>
                             <td>{{ row['Harvard_Yards'] or 'N/A' }}</td>
                             <td>{{ row['Yale_Yards'] or 'N/A' }}</td>
                             <td>{{ row['H_Turnovers'] or 'N/A' }}</td>
                             <td>{{ row['Y_Turnovers'] or 'N/A' }}</td>
                             <td>{{ row['H_First_Downs'] or 'N/A' }}</td>
-                            <td>{{ row['Y_First_Downs'] or 'N/A' }}</td>                            
+                            <td>{{ row['Y_First_Downs'] or 'N/A' }}</td>                        
                         </tr>
                         {% endfor %}
                     </tbody>
