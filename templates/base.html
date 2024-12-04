@@ -1,9 +1,7 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
-
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, width=device-width">
 
@@ -16,24 +14,29 @@
 
     <link href="/static/styles.css" rel="stylesheet">
 
-    <title> Harvard-Yale Sportsbook | {% block title %}{% endblock %}</title>
-
+    <title>Harvard-Yale Sportsbook | {% block title %}{% endblock %}</title>
 </head>
 
 <body class="fill">
 
-    <div class="container-fluid navigation-bar"> <!-- For the navigation bar -->
+    <div class="container-fluid navigation-bar">
+        <!-- For the navigation bar -->
         {% if session["user_id"] %}
         <nav class="nav">
             <a class="nav-link navigation-bar" href="/landing">Dashboard</a>
             <a class="nav-link navigation-bar" href="/bet">Place Bets</a>
+            <a class="nav-link navigation-bar" href="/stats">Stats</a> <!-- Stats Link -->
             <a class="nav-link navigation-bar ml-auto mr-1" href="/logout">Log Out</a>
+            <a class="nav-link navigation-bar" href="/test">Test Link</a>
+
         </nav>
         {% else %}
         <nav class="nav">
             <a class="nav-link active navigation-bar" href="/">Harvard-Yale Sportsbook</a>
+            <a class="nav-link navigation-bar" href="/stats">Stats</a> <!-- New Link -->
             <a class="nav-link navigation-bar" href="/login">Login</a>
             <a class="nav-link navigation-bar" href="/register">Register</a>
+            <a class="nav-link navigation-bar" href="/test">Test Link</a>
         </nav>
         {% endif %}
     </div>
@@ -50,7 +53,8 @@
         {% block main %}{% endblock %}
     </main>
 
-    <footer class="mb-5 text-center info-footer"> <!-- Footer stuff later like links -->
+    <footer class="mb-5 text-center info-footer">
+        <!-- Footer -->
         <p>Developed for CS50 2024 Fall Final Project</p>
     </footer>
 

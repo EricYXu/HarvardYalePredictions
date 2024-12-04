@@ -82,11 +82,11 @@ def register():
         confirmation = request.form.get("confirmation")
 
         # Ensures username is submitted
-        if not request.form.get("username"):
+        if not username:
             return apology("must provide username", 400)
 
         # Ensures password is submitted
-        elif not request.form.get("password"):
+        elif not password:
             return apology("must provide password", 400)
 
         # Ensures password and confirmation match
@@ -94,23 +94,22 @@ def register():
             return apology("password and confirmation must match", 400)
 
         try:
-            # Adds new user to database
-            connection = sqlite3.connect('harvard.db')
-            with open('schema.sql') as f:
-                connection.executescript(f.read())
-            cur = connection.cursor()
-            cur.execute("INSERT INTO users (username, password) VALUES (?, ?)",(username, generate_password_hash(password)))
-            connection.commit()
-            connection.close()
-        except ValueError:
-            # Returns error if username already taken
-            return apology("username taken")
+            # Adds new user to the same database used for login
+            conn = sqlite3.connect('site.db')
+            cur = conn.cursor()
+            cur.execute("INSERT INTO users (username, password) VALUES (?, ?)",
+                        (username, generate_password_hash(password)))
+            conn.commit()
+            conn.close()
+        except sqlite3.IntegrityError:
+            # Returns error if username is already taken
+            return apology("username taken", 400)
 
         # Redirects user back to homepage after registering
         return redirect("/")
-
     else:
         return render_template("register.html")
+
 
 @app.route("/landing", methods=["GET", "POST"])
 def landing():
@@ -136,6 +135,42 @@ def bet():
     """ Betting dashboard for logged in user """
 
     return render_template("bet.html")
+
+
+@app.route("/stats", methods=["GET", "POST"])
+def stats():
+    """Display or filter game statistics."""
+    conn = sqlite3.connect('data.db')
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    # Default query
+    query = "SELECT * FROM GameData"
+    params = []
+
+    # If user submits filters
+    if request.method == "POST":
+        year = request.form.get("year")
+        winner = request.form.get("winner")
+
+        # Build the query dynamically based on filters
+        filters = []
+        if year:
+            filters.append("Year = ?")
+            params.append(year)
+        if winner:
+            filters.append("Winner = ?")
+            params.append(winner)
+
+        if filters:
+            query += " WHERE " + " AND ".join(filters)
+
+    # Execute the query
+    data = cursor.execute(query, params).fetchall()
+    conn.close()
+
+    return render_template("stats.html", data=data)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
