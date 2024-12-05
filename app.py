@@ -342,6 +342,5 @@ def generate_betting_lines():
 # Start a background thread to generate betting lines
 threading.Thread(target=generate_betting_lines, daemon=True).start()
 
-print("hello world"))
 if __name__ == '__main__':
     socketio.run(app, debug=True)
