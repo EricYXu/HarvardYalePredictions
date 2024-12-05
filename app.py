@@ -282,42 +282,6 @@ def get_match_data(match_id):
     conn.close()
     return match
 
-@app.route("/bets")
-def bets():
-    """Show all bets placed by users."""
-    if "user_id" not in session:
-        return redirect("/login")
-
-    conn = sqlite3.connect("site.db")
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    cursor.execute(
-        "SELECT users.username, bets.bet_option, bets.bet_amount, bets.timestamp "
-        "FROM bets JOIN users ON bets.user_id = users.id ORDER BY bets.timestamp DESC"
-    )
-    all_bets = cursor.fetchall()
-    conn.close()
-
-    return render_template("bets.html", bets=all_bets)
-
-def generate_betting_lines():
-    while True:
-        betting_lines = {
-            "team1": "Harvard",
-            "team2": "Yale",
-            "spread1": f"{random.uniform(-3.5, 3.5):.1f}",
-            "spread2": f"{random.uniform(-3.5, 3.5):.1f}",
-            "money1": f"{random.randint(-200, 200)}",
-            "money2": f"{random.randint(-200, 200)}",
-            "total_over": f"{random.uniform(40.0, 50.0):.1f}",
-            "total_under": f"{random.uniform(40.0, 50.0):.1f}"
-        }
-        socketio.emit("update_lines", betting_lines)  # Send betting lines to all connected clients
-        time.sleep(1)  # Update every second
-
-# Start a background thread to generate betting lines
-threading.Thread(target=generate_betting_lines, daemon=True).start()
-
 @app.route('/bets')
 def bets():
     """Display bets and live betting lines."""
@@ -336,6 +300,23 @@ def bets():
 
     return render_template('bets.html', bets=all_bets)
 
+def generate_betting_lines():
+    while True:
+        betting_lines = {
+            "team1": "Harvard",
+            "team2": "Yale",
+            "spread1": f"{random.uniform(-3.5, 3.5):.1f}",
+            "spread2": f"{random.uniform(-3.5, 3.5):.1f}",
+            "money1": f"{random.randint(-200, 200)}",
+            "money2": f"{random.randint(-200, 200)}",
+            "total_over": f"{random.uniform(40.0, 50.0):.1f}",
+            "total_under": f"{random.uniform(40.0, 50.0):.1f}"
+        }
+        socketio.emit("update_lines", betting_lines)  # Send betting lines to all connected clients
+        time.sleep(1)  # Update every second
+
+# Start a background thread to generate betting lines
+threading.Thread(target=generate_betting_lines, daemon=True).start()
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)
