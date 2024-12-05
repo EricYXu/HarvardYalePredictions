@@ -1,12 +1,36 @@
 {% extends "base.html" %}
 
 {% block title %}
-All Bets
+Bets and Live Lines
 {% endblock %}
 
 {% block main %}
 <div class="container mt-5">
-    <h1>All Bets</h1>
+    <h1>Current Betting Lines</h1>
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-bordered text-center" id="betting-lines-table">
+                <thead>
+                    <tr>
+                        <th>Matchup</th>
+                        <th>Spread</th>
+                        <th>Moneyline</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Harvard vs Yale</td>
+                        <td id="spread">Loading...</td>
+                        <td id="money">Loading...</td>
+                        <td id="total">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <h1>User Bets</h1>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -28,4 +52,16 @@ All Bets
         </tbody>
     </table>
 </div>
+
+<script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+<script>
+    const socket = io();
+
+    // Listen for betting line updates
+    socket.on("update_lines", function(data) {
+        document.getElementById("spread").innerHTML = `${data.spread1} / ${data.spread2}`;
+        document.getElementById("money").innerHTML = `${data.money1} / ${data.money2}`;
+        document.getElementById("total").innerHTML = `O ${data.total_over} / U ${data.total_under}`;
+    });
+</script>
 {% endblock %}
