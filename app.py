@@ -303,7 +303,7 @@ def bets():
 def generate_betting_lines():
     try:
         while True:
-            # Generate betting lines
+            # Your betting line generation logic
             betting_lines = {
                 "team1": "Harvard",
                 "team2": "Yale",
@@ -315,13 +315,13 @@ def generate_betting_lines():
                 "total_under": "46.5",
             }
             socketio.emit("update_lines", betting_lines)
-            # time.sleep(1)  # Update every second
+            time.sleep(1)
     except Exception as e:
-        print(f"Error in generate_betting_lines: {e}")
+        print(f"Error in generate_betting_lines thread: {e}")
+
 
 # Start a background thread to generate betting lines
 threading.Thread(target=generate_betting_lines, daemon=True).start()
-
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)
