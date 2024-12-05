@@ -301,19 +301,24 @@ def bets():
     return render_template('bets.html', bets=all_bets)
 
 def generate_betting_lines():
-    while True:
-        betting_lines = {
-            "team1": "Harvard",
-            "team2": "Yale",
-            "spread1": f"{random.uniform(-3.5, 3.5):.1f}",
-            "spread2": f"{random.uniform(-3.5, 3.5):.1f}",
-            "money1": f"{random.randint(-200, 200)}",
-            "money2": f"{random.randint(-200, 200)}",
-            "total_over": f"{random.uniform(40.0, 50.0):.1f}",
-            "total_under": f"{random.uniform(40.0, 50.0):.1f}"
-        }
-        socketio.emit("update_lines", betting_lines)  # Send betting lines to all connected clients
-        time.sleep(1)  # Update every second
+    try:
+        while True:
+            # Generate betting lines
+            betting_lines = {
+                "team1": "Harvard",
+                "team2": "Yale",
+                "spread1": "-1.5",
+                "spread2": "+1.5",
+                "money1": "-120",
+                "money2": "+120",
+                "total_over": "46.5",
+                "total_under": "46.5",
+            }
+            socketio.emit("update_lines", betting_lines)
+            time.sleep(1)  # Update every second
+    except Exception as e:
+        print(f"Error in generate_betting_lines: {e}")
+
 
 # Start a background thread to generate betting lines
 threading.Thread(target=generate_betting_lines, daemon=True).start()
