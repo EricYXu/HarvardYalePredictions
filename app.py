@@ -255,6 +255,20 @@ def place_bet():
     return redirect("/live")
 
 
+def update_odds():
+    """Simulate real-time odds updates."""
+    while True:
+        # Example odds data
+        new_odds = {
+            "spread1": "-1.5",
+            "spread2": "+1.5",
+            "money1": "-120",
+            "money2": "+120",
+            "total": "46.5"
+        }
+        # Broadcast the odds to all clients
+        socketio.emit("odds_update", new_odds, to=None)
+        time.sleep(10)  # Update odds every 10 seconds
 
 # Start the odds updater thread
 Thread(target=update_odds).start()
@@ -321,7 +335,6 @@ def generate_betting_lines():
 
         # Wait for a second before updating the lines again
         time.sleep(1)
-
 
 # Start a background thread to generate betting lines
 threading.Thread(target=generate_betting_lines, daemon=True).start()
