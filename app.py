@@ -199,7 +199,7 @@ def update_odds():
             "total": "46.5"
         }
         # Broadcast the odds to all clients
-        socketio.emit("odds_update", new_odds, broadcast=True)
+        socketio.emit("odds_update", new_odds, to=None)
         time.sleep(10)  # Update odds every 10 seconds
 
 # Start the odds updater thread
