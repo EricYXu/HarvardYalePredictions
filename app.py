@@ -302,7 +302,7 @@ def bets():
 
 def generate_betting_lines():
     """Generate and emit betting lines to all connected clients."""
-    try
+    try:
         while True:
             # Generate a random spread (absolute value between 0.5 and 10.0)
             spread = round(random.uniform(0.5, 10.0), 1)
@@ -342,5 +342,6 @@ def generate_betting_lines():
 # Start a background thread to generate betting lines
 threading.Thread(target=generate_betting_lines, daemon=True).start()
 
+print("hello world"))
 if __name__ == '__main__':
     socketio.run(app, debug=True)
