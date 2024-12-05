@@ -255,20 +255,6 @@ def place_bet():
     return redirect("/live")
 
 
-def update_odds():
-    """Simulate real-time odds updates."""
-    while True:
-        # Example odds data
-        new_odds = {
-            "spread1": "-1.5",
-            "spread2": "+1.5",
-            "money1": "-120",
-            "money2": "+120",
-            "total": "46.5"
-        }
-        # Broadcast the odds to all clients
-        socketio.emit("odds_update", new_odds, to=None)
-        time.sleep(10)  # Update odds every 10 seconds
 
 # Start the odds updater thread
 Thread(target=update_odds).start()
@@ -302,19 +288,40 @@ def bets():
     return render_template('bets.html', bets=all_bets)
 
 def generate_betting_lines():
+    """Generate and emit betting lines to all connected clients."""
     while True:
+        # Generate a random spread (absolute value between 0.5 and 10.0)
+        spread = round(random.uniform(0.5, 10.0), 1)
+
+        # Generate moneylines such that one is positive and the other is negative
+        money1 = random.randint(-200, -100)  # Negative moneyline for team 1
+        money2 = random.randint(100, 200)   # Positive moneyline for team 2
+
+        # Randomize which team gets the positive moneyline
+        if random.choice([True, False]):
+            money1, money2 = money2, money1
+
+        # Generate a random total (between 40.0 and 60.0)
+        total = round(random.uniform(40.0, 60.0), 1)
+
+        # Emit betting lines where spreads are negatives of each other, and total is the same for both
         betting_lines = {
             "team1": "Harvard",
             "team2": "Yale",
-            "spread1": f"{random.uniform(-3.5, 3.5):.1f}",
-            "spread2": f"{random.uniform(-3.5, 3.5):.1f}",
-            "money1": f"{random.randint(-200, 200)}",
-            "money2": f"{random.randint(-200, 200)}",
-            "total_over": f"{random.uniform(40.0, 50.0):.1f}",
-            "total_under": f"{random.uniform(40.0, 50.0):.1f}"
+            "spread1": f"-{spread}",
+            "spread2": f"+{spread}",
+            "money1": f"{money1}",
+            "money2": f"{money2}",
+            "total_over": f"{total}",
+            "total_under": f"{total}"
         }
-        socketio.emit("update_lines", betting_lines)  # Send betting lines to all connected clients
-        time.sleep(1)  # Update every second
+
+        # Send betting lines to all connected clients
+        socketio.emit("update_lines", betting_lines)
+
+        # Wait for a second before updating the lines again
+        time.sleep(1)
+
 
 # Start a background thread to generate betting lines
 threading.Thread(target=generate_betting_lines, daemon=True).start()
