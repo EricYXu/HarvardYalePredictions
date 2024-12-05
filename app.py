@@ -222,11 +222,21 @@ def place_bet():
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    # Check user's current balance
+    # Fetch user's current balance
     cursor.execute("SELECT cash FROM users WHERE id = ?", (user_id,))
     user = cursor.fetchone()
 
-    if not user or user["cash"] < bet_amount:
+    if not user:
+        flash("User not found!", "danger")
+        return redirect("/live")
+
+    user_balance = user["cash"]
+
+    # Validate the bet amount
+    if bet_amount <= 0:
+        flash("Bet amount must be greater than 0!", "danger")
+        return redirect("/live")
+    if bet_amount > user_balance:
         flash("Insufficient balance to place the bet!", "danger")
         return redirect("/live")
 
