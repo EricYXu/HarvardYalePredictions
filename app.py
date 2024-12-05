@@ -3,11 +3,16 @@ from flask import Flask, request, redirect, render_template, session, flash
 from flask_sqlalchemy import SQLAlchemy
 import sqlite3
 from werkzeug.security import check_password_hash, generate_password_hash
+from flask_socketio import SocketIO, emit
+from threading import Thread
+import time
+
 
 from helpers import apology
 
 # Configuring Flask
 app = Flask(__name__)
+socketio = SocketIO(app)
 app.debug = True
 app.config['SECRET_KEY'] = os.urandom(16)
 
@@ -171,5 +176,47 @@ def stats():
 
     return render_template("stats.html", data=data)
 
+@app.route("/live")
+def live():
+    """Render the live betting page."""
+    return render_template("live.html")
+
+# socketio is a live server updating app from chatgpt that gave us an idea on how to make our betting application live
+@socketio.on("update_odds")
+def handle_odds_update(data):
+    """Broadcast new odds to all connected clients."""
+    emit("odds_update", data, broadcast=True)
+
+def update_odds():
+    """Simulate real-time odds updates."""
+    while True:
+        # Example odds data
+        new_odds = {
+            "spread1": "-1.5",
+            "spread2": "+1.5",
+            "money1": "-120",
+            "money2": "+120",
+            "total": "46.5"
+        }
+        # Broadcast the odds to all clients
+        socketio.emit("odds_update", new_odds, broadcast=True)
+        time.sleep(10)  # Update odds every 10 seconds
+
+# Start the odds updater thread
+Thread(target=update_odds).start()
+
+def get_match_data(match_id):
+    """Fetch match data from the database."""
+    conn = sqlite3.connect('data.db')
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    query = "SELECT * FROM Matches WHERE id = ?"
+    match = cursor.execute(query, (match_id,)).fetchone()
+    conn.close()
+    return match
+
+
+
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app, debug=True)
