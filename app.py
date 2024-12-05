@@ -319,10 +319,9 @@ def generate_betting_lines():
     except Exception as e:
         print(f"Error in generate_betting_lines: {e}")
 
-
-
 # Start a background thread to generate betting lines
 threading.Thread(target=generate_betting_lines, daemon=True).start()
+
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)
