@@ -1,37 +1,15 @@
-{% extends "base.html" %}
-
-{% block title %}
-Live Betting - Harvard vs Yale
-{% endblock %}
-
-{% block main %}
 <div class="container mt-5">
-    <h1>Harvard vs Yale - Live Betting</h1>
-    <p>Game Time: <span id="game-timer">00:00</span></p>
+    <h1>Live Betting - Harvard vs Yale</h1>
 
-    <div class="row text-center">
-        <div class="col">
-            <h3>Spread</h3>
-            <p id="spread1">Harvard: -1.5</p>
-            <p id="spread2">Yale: +1.5</p>
-        </div>
-        <div class="col">
-            <h3>Money</h3>
-            <p id="money1">Harvard: -125</p>
-            <p id="money2">Yale: +125</p>
-        </div>
-        <div class="col">
-            <h3>Total</h3>
-            <p id="total_over">Over 45.5</p>
-            <p id="total_under">Under 45.5</p>
-        </div>
-    </div>
+    <!-- Show user balance -->
+    <p>Your remaining balance: ${{ user_balance }}</p>
 
-    <div class="row mt-5">
-        <div class="col text-center">
-            <h4>Place Your Bet</h4>
-            <form id="bet-form">
-                <select id="bet-option" class="form-select">
+    <!-- Betting form -->
+    <form action="/place_bet" method="post">
+        <div class="row">
+            <div class="col-md-6">
+                <label for="bet-option" class="form-label">Bet Option</label>
+                <select name="bet_option" id="bet-option" class="form-select">
                     <option value="spread1">Harvard Spread</option>
                     <option value="spread2">Yale Spread</option>
                     <option value="money1">Harvard Moneyline</option>
@@ -39,33 +17,12 @@ Live Betting - Harvard vs Yale
                     <option value="total_over">Over 45.5</option>
                     <option value="total_under">Under 45.5</option>
                 </select>
-                <input type="number" id="bet-amount" class="form-control mt-3" placeholder="Enter amount">
-                <button type="submit" class="btn btn-primary mt-3">Place Bet</button>
-            </form>
+            </div>
+            <div class="col-md-6">
+                <label for="bet-amount" class="form-label">Bet Amount</label>
+                <input type="number" name="bet_amount" id="bet-amount" class="form-control" placeholder="Enter amount" required>
+            </div>
         </div>
-    </div>
+        <button type="submit" class="btn btn-primary mt-3">Place Bet</button>
+    </form>
 </div>
-
-<script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
-<script>
-    const socket = io();
-
-    // Listen for odds updates
-    socket.on("odds_update", function(data) {
-        document.getElementById("spread1").innerText = `Harvard: ${data.spread1}`;
-        document.getElementById("spread2").innerText = `Yale: ${data.spread2}`;
-        document.getElementById("money1").innerText = `Harvard: ${data.money1}`;
-        document.getElementById("money2").innerText = `Yale: ${data.money2}`;
-        document.getElementById("total_over").innerText = `Over ${data.total}`;
-        document.getElementById("total_under").innerText = `Under ${data.total}`;
-    });
-
-    // Submit bets
-    document.getElementById("bet-form").onsubmit = function(event) {
-        event.preventDefault();
-        const option = document.getElementById("bet-option").value;
-        const amount = document.getElementById("bet-amount").value;
-        alert(`Bet placed on ${option} for $${amount}`);
-    };
-</script>
-{% endblock %}

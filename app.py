@@ -179,13 +179,62 @@ def stats():
 @app.route("/live")
 def live():
     """Render the live betting page."""
-    return render_template("live.html")
+    if "user_id" not in session:
+        return redirect("/login")
+
+    # Fetch the user's current balance
+    user_id = session["user_id"]
+    conn = sqlite3.connect("site.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute("SELECT cash FROM users WHERE id = ?", (user_id,))
+    user = cursor.fetchone()
+    conn.close()
+
+    return render_template("live.html", user_balance=user["cash"])
+
 
 # socketio is a live server updating app from chatgpt that gave us an idea on how to make our betting application live
 @socketio.on("update_odds")
 def handle_odds_update(data):
     """Broadcast new odds to all connected clients."""
     emit("odds_update", data, broadcast=True)
+
+@app.route("/place_bet", methods=["POST"])
+def place_bet():
+    """Handle user bet placement."""
+    if "user_id" not in session:
+        return redirect("/login")
+
+    user_id = session["user_id"]
+    bet_option = request.form.get("bet_option")
+    bet_amount = float(request.form.get("bet_amount"))
+
+    # Connect to the database
+    conn = sqlite3.connect("site.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    # Check user's current balance
+    cursor.execute("SELECT cash FROM users WHERE id = ?", (user_id,))
+    user = cursor.fetchone()
+
+    if not user or user["cash"] < bet_amount:
+        flash("Insufficient balance to place the bet!", "danger")
+        return redirect("/live")
+
+    # Deduct the bet amount and log the bet
+    cursor.execute("UPDATE users SET cash = cash - ? WHERE id = ?", (bet_amount, user_id))
+    cursor.execute(
+        "INSERT INTO bets (user_id, bet_option, bet_amount) VALUES (?, ?, ?)",
+        (user_id, bet_option, bet_amount),
+    )
+    conn.commit()
+    conn.close()
+
+    flash("Bet placed successfully!", "success")
+    return redirect("/live")
+
 
 def update_odds():
     """Simulate real-time odds updates."""
@@ -215,6 +264,23 @@ def get_match_data(match_id):
     conn.close()
     return match
 
+@app.route("/bets")
+def bets():
+    """Show all bets placed by users."""
+    if "user_id" not in session:
+        return redirect("/login")
+
+    conn = sqlite3.connect("site.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT users.username, bets.bet_option, bets.bet_amount, bets.timestamp "
+        "FROM bets JOIN users ON bets.user_id = users.id ORDER BY bets.timestamp DESC"
+    )
+    all_bets = cursor.fetchall()
+    conn.close()
+
+    return render_template("bets.html", bets=all_bets)
 
 
 
