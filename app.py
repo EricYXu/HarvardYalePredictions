@@ -118,14 +118,21 @@ def register():
 
 @app.route("/landing", methods=["GET", "POST"])
 def landing():
-    """ Sends logged-in user to landing dashboard """
+    """Sends logged-in user to landing dashboard"""
 
-    # Query database for username
+    # Check if the user is logged in
+    if "user_id" not in session:
+        # Redirect to login page if no user is logged in
+        return redirect("/login")
+
+    # Query database for the logged-in user's information
     conn = get_db_connection()
-    user = conn.execute("SELECT * FROM users WHERE id = ?", (session["user_id"],)).fetchall() # TODO: There is some issue with session --> FIX
+    user = conn.execute("SELECT * FROM users WHERE id = ?", (session["user_id"],)).fetchone()
     conn.close()
-    
+
+    # Pass user data to the template
     return render_template("landing.html", data=user)
+
 
 @app.route("/logout")
 def logout():
