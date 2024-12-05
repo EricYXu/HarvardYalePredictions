@@ -31,14 +31,13 @@ def get_db_connection():
 def index():
     """ Homepage """
 
-    # Connect to database to get users and display on the home page
+    # Connects to database to get users and display on home page
     conn = get_db_connection()
     users = conn.execute('SELECT * FROM users').fetchall()
-    count = conn.execute('SELECT COUNT(*) AS user_count FROM users').fetchone()['user_count']
+    count = conn.execute('SELECT COUNT(*) FROM users').fetchall()
     conn.close()
 
     return render_template('home.html', data=users, userCount=count)
-
 
 # Render login.html page
 @app.route('/login', methods=["GET", "POST"])
