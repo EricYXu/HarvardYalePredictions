@@ -283,9 +283,9 @@ def get_match_data(match_id):
     conn.close()
     return match
 
-@app.route("/bets")
+@app.route('/bets')
 def bets():
-    """Show all bets placed by users."""
+    """Display bets and live betting lines."""
     if "user_id" not in session:
         return redirect("/login")
 
@@ -299,7 +299,7 @@ def bets():
     all_bets = cursor.fetchall()
     conn.close()
 
-    return render_template("bets.html", bets=all_bets)
+    return render_template('bets.html', bets=all_bets)
 
 def generate_betting_lines():
     while True:
@@ -319,23 +319,6 @@ def generate_betting_lines():
 # Start a background thread to generate betting lines
 threading.Thread(target=generate_betting_lines, daemon=True).start()
 
-@app.route('/bets')
-def bets():
-    """Display bets and live betting lines."""
-    if "user_id" not in session:
-        return redirect("/login")
-
-    conn = sqlite3.connect("site.db")
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    cursor.execute(
-        "SELECT users.username, bets.bet_option, bets.bet_amount, bets.timestamp "
-        "FROM bets JOIN users ON bets.user_id = users.id ORDER BY bets.timestamp DESC"
-    )
-    all_bets = cursor.fetchall()
-    conn.close()
-
-    return render_template('bets.html', bets=all_bets)
 
 
 if __name__ == '__main__':
