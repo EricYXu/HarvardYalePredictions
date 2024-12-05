@@ -315,7 +315,7 @@ def generate_betting_lines():
                 "total_under": "46.5",
             }
             socketio.emit("update_lines", betting_lines)
-            time.sleep(1)  # Update every second
+            # time.sleep(1)  # Update every second
     except Exception as e:
         print(f"Error in generate_betting_lines: {e}")
 
