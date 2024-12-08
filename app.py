@@ -153,9 +153,8 @@ def bet():
 
 
 @app.route("/stats", methods=["GET", "POST"])
-@app.route("/stats", methods=["GET", "POST"])
 def stats():
-    """Display game stats via embedding."""
+    """Display game stats via redirect."""
     
     # Mapping of years to URLs
     game_urls = {
@@ -194,6 +193,7 @@ def stats():
                 error = f"No data available for the year {year}."
 
     return render_template("stats.html", embed_url=embed_url, error=error)
+
 
 
 def scrape_game_stats(url, year):
