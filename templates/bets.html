@@ -44,7 +44,7 @@ Bets and Live Lines
             {% for bet in bets %}
             <tr>
                 <td>{{ bet["username"] }}</td>
-                <td>{{ bet["bet_option"] }}</td>
+                <td>{{ BET_OPTIONS[bet["bet_option"]] }}</td> <!-- Use BET_OPTIONS to display readable name -->
                 <td>${{ "%.2f"|format(bet["bet_amount"]) }}</td>
                 <td>{{ bet["timestamp"] }}</td>
             </tr>
