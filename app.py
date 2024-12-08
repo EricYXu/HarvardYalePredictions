@@ -128,9 +128,15 @@ def landing():
         # Redirect to login page if no user is logged in
         return redirect("/login")
 
+    # Grab user ID
+    user_id = session["user_id"]
+
     # Query database for the logged-in user's information
-    conn = get_db_connection()
-    user = conn.execute("SELECT * FROM users WHERE id = ?", (session["user_id"],)).fetchone()
+    conn = sqlite3.connect("site.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+    user = cursor.fetchone()
     conn.close()
 
     # Pass user data to the template
@@ -140,7 +146,6 @@ def landing():
 @app.route("/logout")
 def logout():
     """ Logs user out """
-
     # Clears session and forget user_id
     session.clear()
     return redirect("/")
