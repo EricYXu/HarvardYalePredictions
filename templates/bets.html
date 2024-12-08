@@ -6,6 +6,7 @@ Bets and Live Lines
 
 {% block main %}
 <div class="container mt-5">
+    <!-- Created table to display live betting lines -->
     <h1>Current Betting Lines</h1>
     <div class="row">
         <div class="col-md-12">
@@ -20,6 +21,7 @@ Bets and Live Lines
                 </thead>
                 <tbody>
                     <tr>
+                        <!-- These cells will be updated dynamically with live data once we have betting lines -->
                         <td>Harvard vs Yale</td>
                         <td id="spread">Loading...</td>
                         <td id="money">Loading...</td>
@@ -40,7 +42,9 @@ Bets and Live Lines
                 <th>Timestamp</th>
             </tr>
         </thead>
+         <!-- Created a Table for purpose of displaying user bets -->
         <tbody>
+            <!-- Loop through the bets data -->
             {% for bet in bets %}
             <tr>
                 <td>{{ bet["username"] }}</td>
@@ -53,11 +57,12 @@ Bets and Live Lines
     </table>
 </div>
 
+<!-- Use the Socket.IO library for real-time updates on the website to see other peoples bets -->
 <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
 <script>
     const socket = io();
 
-    // Listen for betting line updates
+    // Listen for the betting lines update event from the server
     socket.on("update_lines", function(data) {
         document.getElementById("spread").innerHTML = `${data.spread1} / ${data.spread2}`;
         document.getElementById("money").innerHTML = `${data.money1} / ${data.money2}`;

@@ -6,6 +6,7 @@ Home
 
 {% block main %}
 
+<!-- this is the base website when first on the site-->
 <div class="container-fluid image-intro px-4 text-center">
     <div class="row">
         <div class="col image-intro">
@@ -22,21 +23,11 @@ Home
         <div class="col image-intro">
             <img src="./static/harvardFootball.jpg" class="smooth-image" alt="harvard-football">
         </div>
-        <!-- Commented out user debugging code -->
-        <!-- 
-        {% for user in data %}
-        <div class='row'>
-            <p>{{ user['created'] }}</p>
-            <p>{{ user['username'] }}</p>
-            <p>{{ user['password'] }}</p>
-            <p>${{ user['cash'] }}</p>
-        </div>
-        {% endfor %}
-        -->
+
     </div>
     <div class="row">
         <div class="col image-intro">
-            <!-- Dynamically display the user count -->
+            <!-- Dynamically display the user count so people know how many people are signed up -->
             <h1><b>Over {{ userCount }} people registered</b></h1>
             <div class="row">
                 <div class="col">

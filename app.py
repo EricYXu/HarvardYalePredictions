@@ -14,26 +14,30 @@ from bs4 import BeautifulSoup
 
 # Configuring Flask
 app = Flask(__name__)
+
+# Configuring socketio, something ChatGPT recommended us to use to see live responses and real time updates
 socketio = SocketIO(app)
 app.debug = True
+
+# Setting a secret key for each session
 app.config['SECRET_KEY'] = os.urandom(16)
 
-# Configure session to use filesystem (instead of signed cookies)
+# Configuring each flask session to use filesystem instead of signed cookies
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 
-# Connects to database
+# Connects to database 
 def get_db_connection():
     conn = sqlite3.connect('site.db')
     conn.row_factory = sqlite3.Row
     return conn
 
-# Render home.html page
+# Render home.html page so user will see the page when website clicked on
 @app.route('/')
 def index():
     """ Homepage """
 
-    # Connect to database to get users and display on the home page
+    # Connect to database to get users and display on the home page also get all user data
     conn = get_db_connection()
     users = conn.execute('SELECT * FROM users').fetchall()
     count = conn.execute('SELECT COUNT(*) AS user_count FROM users').fetchone()['user_count']
@@ -47,62 +51,68 @@ def index():
 def login():
     """ Login user """
 
-    # Forget any user_id
+    # Forget any user_id from previous
     session.clear()
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
-        # Ensure username was submitted
+
+        # Make sure that a username was submitted, otherwise tell user they need one
         if not request.form.get("username"):
             return apology("must provide username", 403)
-        # Ensure password was submitted
+        
+        # Make sure password was submitted, otherwise tell the user to input one
         elif not request.form.get("password"):
             return apology("must provide password", 403)
-        # Query database for username
+        
+        # Query database for username and allow user to log in if it is our database
         conn = get_db_connection()
         rows = conn.execute("SELECT * FROM users WHERE username = ?", (request.form.get("username"),)).fetchall()
         conn.close()
 
-        # Ensure username exists and password is correct
+        # Make sure that username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0]["password"], request.form.get("password")):
             return apology("invalid username and/or password", 403)
-        # Remember which user has logged in
+        
+        # This allows us to remember which user has logged in, and be used in other places
         session["user_id"] = rows[0]["id"]
 
         flash('Successfully logged in!')
 
-        # Redirect user to home page, TODO: insert user data from SQL query here
+        # Redirect user to home page, but give them the homepage for logged in users.
         return redirect("/landing")
 
-    # User reached route via GET (as by clicking a link or via redirect)
+    # Else make user return to login page if user does not do anything
     else:
         return render_template("login.html")
 
-# Render register.html page
+# Render the register.html page
 @app.route("/register", methods=["GET", "POST"])
 def register():
     """Register user"""
 
     if request.method == "POST":
-        # Grab input fields from registration form
+
+        # Get the input fields from registration form, and also use this to register the user
         username = request.form.get("username")
         password = request.form.get("password")
         confirmation = request.form.get("confirmation")
 
-        # Ensures username is submitted
+        # Make sure a username is submitted
         if not username:
             return apology("must provide username", 400)
 
-        # Ensures password is submitted
+        # Make sure a password is submitted
         elif not password:
             return apology("must provide password", 400)
 
-        # Ensures password and confirmation match
+        # Make sure that the password and confirmation password match
         elif password != confirmation:
             return apology("password and confirmation must match", 400)
 
         try:
-            # Adds new user to the same database used for login
+
+            # Add the new user to the same database used for login, so for future logins, the user will have the account data stored
             conn = sqlite3.connect('site.db')
             cur = conn.cursor()
             cur.execute("INSERT INTO users (username, password) VALUES (?, ?)",
@@ -110,11 +120,14 @@ def register():
             conn.commit()
             conn.close()
         except sqlite3.IntegrityError:
-            # Returns error if username is already taken
+
+            # Return an error if username is already taken by someone else
             return apology("username taken", 400)
 
-        # Redirects user back to homepage after registering
+        # Redirect the user back to homepage after registering for the betting site
         return redirect("/")
+    
+    # If nothing is submitted, stay on register
     else:
         return render_template("register.html")
 
@@ -161,7 +174,7 @@ def bet():
 def stats():
     """Display game stats via redirect."""
     
-    # Mapping of years to URLs
+    # Dictionary of years to URLs
     game_urls = {
         2010: "https://www.espn.com/college-football/game/_/gameId/303240108/yale-harvard",
         2011: "https://www.espn.com/college-football/game/_/gameId/313230043/harvard-yale",
@@ -182,7 +195,7 @@ def stats():
 
     embed_url = None
     error = None
-
+    # make sure that the inputted year is valid, and also if year is 2020, describe why the game wasnt played. 
     if request.method == "POST":
         year = request.form.get("year")
         if not year or not year.isdigit():
@@ -208,7 +221,7 @@ def scrape_game_stats(url, year):
         response.raise_for_status()
         soup = BeautifulSoup(response.text, 'html.parser')
 
-        # Example scraping logic
+        # scraping logic so we can pull to find the ESPN website for users to see
         stats = []
         stats_table = soup.find('table', class_='Table')  # Adjust as needed
         if stats_table:
@@ -329,6 +342,7 @@ def get_match_data(match_id):
 @app.route('/bets')
 def bets():
     """Display bets and live betting lines."""
+    # if the user is not in the session to bet, then redirect them
     if "user_id" not in session:
         return redirect("/login")
 
@@ -347,7 +361,7 @@ def bets():
 def generate_betting_lines():
     try:
         while True:
-            # Your betting line generation logic
+            # betting line generation for lines in 2025
             betting_lines = {
                 "team1": "Harvard",
                 "team2": "Yale",
@@ -362,6 +376,7 @@ def generate_betting_lines():
             time.sleep(1)
     except Exception as e:
         print(f"Error in generate_betting_lines thread: {e}")
+
 
 
 # Start a background thread to generate betting lines

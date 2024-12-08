@@ -22,18 +22,16 @@
     <div class="container-fluid navigation-bar">
         <!-- For the navigation bar -->
         {% if session["user_id"] %}
+        <!-- Links for user to navigate if they are logged in -->
         <nav class="nav">
             <a class="nav-link navigation-bar" href="/landing">Dashboard</a>
-            <a class="nav-link navigation-bar" href="/stats">Stats</a> <!-- Stats Link -->
+            <a class="nav-link navigation-bar" href="/stats">Stats</a> 
             <a class="nav-link navigation-bar ml-auto mr-1" href="/logout">Log Out</a>
-            <a class="nav-link navigation-bar" href="/live">Live Betting</a> <!-- Added Live Betting Link -->
+            <a class="nav-link navigation-bar" href="/live">Live Betting</a> 
             <a class="nav-link navigation-bar" href="/bets">All Bets</a>
-
-
-
-
         </nav>
         {% else %}
+        <!-- only links for people who arent logged in -->
         <nav class="nav">
             <a class="nav-link active navigation-bar" href="/">Harvard-Yale Sportsbook</a>
             <a class="nav-link navigation-bar" href="/login">Login</a>
