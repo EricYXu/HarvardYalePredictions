@@ -1,80 +1,64 @@
 {% extends "base.html" %}
 
 {% block title %}
-Game Statistics
+Game Stats Search
 {% endblock %}
 
 {% block main %}
-<div class="container-fluid image-intro px-4 text-center">
-    <div class="row">
-        <div class="col image-intro">
-            <h1><b>Harvard-Yale Game Statistics</b></h1>
-            <h4>Explore statistics for each year's game!</h4>
-        </div>
-    </div>
+<div class="container mt-5">
+    <h1 class="mb-4">Search Game Stats Across Multiple Sources</h1>
 
-    <div class="row">
-        <div class="col image-intro">
-            <!-- Filter Section -->
-            <h3>Filter Results</h3>
-            <form method="POST" class="mb-4">
-                <div class="row">
-                    <div class="col-md-4">
-                        <label for="year" class="form-label">Year</label>
-                        <input type="number" name="year" id="year" class="form-control" placeholder="Enter Year">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="winner" class="form-label">Winner</label>
-                        <select name="winner" id="winner" class="form-select">
-                            <option value="">All</option>
-                            <option value="Harvard">Harvard</option>
-                            <option value="Yale">Yale</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary">Apply Filter</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col image-intro">
-            <!-- Statistics Table -->
-            <div class="table-responsive">
-                <table class="table table-striped table-bordered">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Year</th>
-                            <th>Score</th>
-                            <th>Winner</th>
-                            <th>Harvard Yards</th>
-                            <th>Yale Yards</th>
-                            <th>Harvard Turnovers</th>
-                            <th>Yale Turnovers</th>
-                            <th>Harvard First Downs</th>
-                            <th>Yale First Downs</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for row in data %}
-                        <tr>
-                            <td>{{ row['Year'] }}</td>
-                            <td>{{ row['Score'] }}</td>
-                            <td>{{ row['Winner'] }}</td>
-                            <td>{{ row['Harvard_Yards'] or 'N/A' }}</td>
-                            <td>{{ row['Yale_Yards'] or 'N/A' }}</td>
-                            <td>{{ row['H_Turnovers'] or 'N/A' }}</td>
-                            <td>{{ row['Y_Turnovers'] or 'N/A' }}</td>
-                            <td>{{ row['H_First_Downs'] or 'N/A' }}</td>
-                            <td>{{ row['Y_First_Downs'] or 'N/A' }}</td>                        
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+    <!-- Input Form -->
+    <form method="POST" class="mb-4">
+        <div class="row">
+            <div class="col-md-6">
+                <label for="year" class="form-label">Year</label>
+                <input type="number" name="year" id="year" class="form-control" placeholder="Enter Year">
+            </div>
+            <div class="col-md-6">
+                <label for="team" class="form-label">Team</label>
+                <input type="text" name="team" id="team" class="form-control" placeholder="Enter Team (e.g., Harvard)">
             </div>
         </div>
+        <div class="row mt-3">
+            <div class="col">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Display Errors -->
+    {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    <!-- Display Results -->
+    {% if stats_data %}
+    <h2 class="mt-4">Aggregated Results</h2>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Year</th>
+                    <th>Score</th>
+                    <th>Winner</th>
+                    <th>Harvard Yards</th>
+                    <th>Yale Yards</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in stats_data %}
+                <tr>
+                    <td>{{ row.Year }}</td>
+                    <td>{{ row.Score }}</td>
+                    <td>{{ row.Winner }}</td>
+                    <td>{{ row.Harvard_Yards }}</td>
+                    <td>{{ row.Yale_Yards }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
+    {% endif %}
 </div>
 {% endblock %}
