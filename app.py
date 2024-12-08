@@ -154,75 +154,81 @@ def bet():
 
 @app.route("/stats", methods=["GET", "POST"])
 def stats():
-    """Display game stats based on user input via web scraping across multiple websites."""
-    
-    stats_data = []  # List to hold aggregated stats data
-    error = None  # For error messages
+    """Display game stats based on user input via web scraping."""
+
+    # Mapping of years to URLs
+    game_urls = {
+        2010: "https://www.espn.com/college-football/game/_/gameId/303240108/yale-harvard",
+        2011: "https://www.espn.com/college-football/game/_/gameId/313230043/harvard-yale",
+        2012: "https://www.espn.com/college-football/game/_/gameId/323220108/yale-harvard",
+        2013: "https://www.espn.com/college-football/game/_/gameId/333270043/harvard-yale",
+        2014: "https://www.espn.com/college-football/game/_/gameId/400558443/yale-harvard",
+        2015: "https://www.espn.com/college-football/game/_/gameId/400799629/harvard-yale",
+        2016: "https://www.espn.com/college-football/game/_/gameId/400871335/yale-harvard",
+        2017: "https://www.espn.com/college-football/game/_/gameId/400951036/harvard-yale",
+        2018: "https://www.espn.com/college-football/game/_/gameId/401035274/yale-harvard",
+        2019: "https://www.espn.com/college-football/game/_/gameId/401128680/harvard-yale",
+        2020: None,  # Special case for COVID year
+        2021: "https://www.espn.com/college-football/game/_/gameId/401344147/harvard-yale",
+        2022: "https://www.espn.com/college-football/game/_/gameId/401418602/yale-harvard",
+        2024: "https://www.espn.com/college-football/game/_/gameId/401644605/yale-harvard",
+    }
+
+    stats_data = []  # Aggregated stats data
+    error = None
 
     if request.method == "POST":
-        # Get user input
         year = request.form.get("year")
-        team = request.form.get("team")
-
-        # Validate input
-        if not year and not team:
-            error = "Please enter a year or team to search for game stats."
+        if not year or not year.isdigit():
+            error = "Please enter a valid year."
         else:
-            try:
-                # Define the websites to scrape and their specific logic
-                websites = [
-                    {"name": "Website1", "url": f"https://example1.com/stats?year={year}&team={team}", "scrape_func": scrape_website1},
-                    {"name": "Website2", "url": f"https://example2.com/search/{year}/{team}", "scrape_func": scrape_website2},
-                ]
+            year = int(year)
+            if year == 2020:
+                # Special case for 2020
+                stats_data.append({
+                    "Year": 2020,
+                    "Statistic": "Game Status",
+                    "Harvard": "No Game",
+                    "Yale": "COVID-19 Pandemic",
+                })
+            elif year in game_urls:
+                # Scrape data for other years
+                url = game_urls[year]
+                if url:
+                    stats_data.extend(scrape_game_stats(url, year))
+                else:
+                    error = f"No URL found for the year {year}."
+            else:
+                error = f"No data available for the year {year}."
 
-                # Iterate through each website and scrape data
-                for site in websites:
-                    response = requests.get(site["url"])
-                    response.raise_for_status()  # Raise an exception for HTTP errors
-                    # Use the specific scraping function for the website
-                    site_stats = site["scrape_func"](response.text)
-                    stats_data.extend(site_stats)
-
-            except requests.RequestException as e:
-                error = f"Error fetching data: {e}"
-            except AttributeError:
-                error = "Could not find game stats for the given input."
-
-    # Render the stats page
     return render_template("stats.html", stats_data=stats_data, error=error)
 
-# Scraping logic for Website1
-def scrape_website1(html):
-    """Scrape stats from Website1."""
-    soup = BeautifulSoup(html, "html.parser")
-    stats = []
-    stats_table = soup.find("table", {"id": "stats-table"})  # Update selector as needed
-    for row in stats_table.find_all("tr")[1:]:  # Skip header row
-        cells = row.find_all("td")
-        stats.append({
-            "Year": cells[0].get_text(strip=True),
-            "Score": cells[1].get_text(strip=True),
-            "Winner": cells[2].get_text(strip=True),
-            "Harvard_Yards": cells[3].get_text(strip=True),
-            "Yale_Yards": cells[4].get_text(strip=True),
-        })
-    return stats
+def scrape_game_stats(url, year):
+    """Scrape game stats from a given ESPN URL."""
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, 'html.parser')
 
-# Scraping logic for Website2
-def scrape_website2(html):
-    """Scrape stats from Website2."""
-    soup = BeautifulSoup(html, "html.parser")
-    stats = []
-    stats_table = soup.find("div", {"class": "stats-container"})  # Update selector as needed
-    for item in stats_table.find_all("div", {"class": "stat-row"}):
-        stats.append({
-            "Year": item.find("span", {"class": "year"}).get_text(strip=True),
-            "Score": item.find("span", {"class": "score"}).get_text(strip=True),
-            "Winner": item.find("span", {"class": "winner"}).get_text(strip=True),
-            "Harvard_Yards": item.find("span", {"class": "harvard-yards"}).get_text(strip=True),
-            "Yale_Yards": item.find("span", {"class": "yale-yards"}).get_text(strip=True),
-        })
-    return stats
+        # Example scraping logic
+        stats = []
+        stats_table = soup.find('table', class_='Table')  # Adjust as needed
+        if stats_table:
+            for row in stats_table.find_all('tr')[1:]:  # Skip header row
+                cells = row.find_all('td')
+                stats.append({
+                    "Year": year,
+                    "Statistic": cells[0].get_text(strip=True),
+                    "Harvard": cells[1].get_text(strip=True),
+                    "Yale": cells[2].get_text(strip=True),
+                })
+        return stats
+    except requests.RequestException as e:
+        print(f"Error fetching the page for {year}: {e}")
+        return []
+    except AttributeError:
+        print(f"Could not parse stats table for {year}.")
+        return []
 
 @app.route("/live")
 def live():
