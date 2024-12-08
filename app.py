@@ -28,16 +28,6 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-# Mapping for bet options
-BET_OPTIONS = {
-    "spread1": "Harvard Spread",
-    "spread2": "Yale Spread",
-    "money1": "Harvard Moneyline",
-    "money2": "Yale Moneyline",
-    "total_over": "Over 45.5",
-    "total_under": "Under 45.5"
-}
-
 # Render home.html page
 @app.route('/')
 def index():
@@ -264,6 +254,7 @@ def handle_odds_update(data):
 
 @app.route("/place_bet", methods=["POST"])
 def place_bet():
+    """Handle user bet placement."""
     if "user_id" not in session:
         return redirect("/login")
 
@@ -271,17 +262,22 @@ def place_bet():
     bet_option = request.form.get("bet_option")
     bet_amount = float(request.form.get("bet_amount"))
 
-    # Database connection
+    # Connect to the database
     conn = sqlite3.connect("site.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    # Fetch user balance
+    # Fetch user's current balance
     cursor.execute("SELECT cash FROM users WHERE id = ?", (user_id,))
     user = cursor.fetchone()
+
+    if not user:
+        flash("User not found!", "danger")
+        return redirect("/live")
+
     user_balance = user["cash"]
 
-    # Validate bet amount
+    # Validate the bet amount
     if bet_amount <= 0:
         flash("Bet amount must be greater than 0!", "danger")
         return redirect("/live")
@@ -289,7 +285,7 @@ def place_bet():
         flash("Insufficient balance to place the bet!", "danger")
         return redirect("/live")
 
-    # Deduct the bet amount and store the bet
+    # Deduct the bet amount and log the bet
     cursor.execute("UPDATE users SET cash = cash - ? WHERE id = ?", (bet_amount, user_id))
     cursor.execute(
         "INSERT INTO bets (user_id, bet_option, bet_amount) VALUES (?, ?, ?)",
@@ -298,10 +294,8 @@ def place_bet():
     conn.commit()
     conn.close()
 
-    flash(f"Bet placed successfully on {BET_OPTIONS[bet_option]}!", "success")  # Use readable name
+    flash("Bet placed successfully!", "success")
     return redirect("/live")
-
-
 
 
 def update_odds():
@@ -348,8 +342,7 @@ def bets():
     all_bets = cursor.fetchall()
     conn.close()
 
-    # Pass bets and BET_OPTIONS to the template
-    return render_template('bets.html', bets=all_bets, BET_OPTIONS=BET_OPTIONS)
+    return render_template('bets.html', bets=all_bets)
 
 def generate_betting_lines():
     try:
