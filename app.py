@@ -153,9 +153,10 @@ def bet():
 
 
 @app.route("/stats", methods=["GET", "POST"])
+@app.route("/stats", methods=["GET", "POST"])
 def stats():
-    """Display game stats based on user input via web scraping."""
-
+    """Display game stats via embedding."""
+    
     # Mapping of years to URLs
     game_urls = {
         2010: "https://www.espn.com/college-football/game/_/gameId/303240108/yale-harvard",
@@ -168,13 +169,14 @@ def stats():
         2017: "https://www.espn.com/college-football/game/_/gameId/400951036/harvard-yale",
         2018: "https://www.espn.com/college-football/game/_/gameId/401035274/yale-harvard",
         2019: "https://www.espn.com/college-football/game/_/gameId/401128680/harvard-yale",
-        2020: None,  # Special case for COVID year
+        2020: None,  # COVID year
         2021: "https://www.espn.com/college-football/game/_/gameId/401344147/harvard-yale",
         2022: "https://www.espn.com/college-football/game/_/gameId/401418602/yale-harvard",
+        2023: "https://www.espn.com/college-football/game/_/gameId/401540345/harvard-yale",
         2024: "https://www.espn.com/college-football/game/_/gameId/401644605/yale-harvard",
     }
 
-    stats_data = []  # Aggregated stats data
+    embed_url = None
     error = None
 
     if request.method == "POST":
@@ -184,24 +186,15 @@ def stats():
         else:
             year = int(year)
             if year == 2020:
-                # Special case for 2020
-                stats_data.append({
-                    "Year": 2020,
-                    "Statistic": "Game Status",
-                    "Harvard": "No Game",
-                    "Yale": "COVID-19 Pandemic",
-                })
+                # Special case for COVID
+                error = "No game played in 2020 due to COVID-19."
             elif year in game_urls:
-                # Scrape data for other years
-                url = game_urls[year]
-                if url:
-                    stats_data.extend(scrape_game_stats(url, year))
-                else:
-                    error = f"No URL found for the year {year}."
+                embed_url = game_urls[year]
             else:
                 error = f"No data available for the year {year}."
 
-    return render_template("stats.html", stats_data=stats_data, error=error)
+    return render_template("stats.html", embed_url=embed_url, error=error)
+
 
 def scrape_game_stats(url, year):
     """Scrape game stats from a given ESPN URL."""

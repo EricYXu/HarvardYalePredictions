@@ -28,31 +28,10 @@ Game Stats Search
     <div class="alert alert-danger">{{ error }}</div>
     {% endif %}
 
-    <!-- Display Results -->
-    {% if stats_data %}
-    <h2 class="mt-4">Game Stats</h2>
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered">
-            <thead class="table-dark">
-                <tr>
-                    <th>Year</th>
-                    <th>Statistic</th>
-                    <th>Harvard</th>
-                    <th>Yale</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in stats_data %}
-                <tr>
-                    <td>{{ row.Year }}</td>
-                    <td>{{ row.Statistic }}</td>
-                    <td>{{ row.Harvard }}</td>
-                    <td>{{ row.Yale }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <!-- Embed Website -->
+    {% if embed_url %}
+    <h2 class="mt-4">Game Stats for Selected Year</h2>
+    <iframe src="{{ embed_url }}" width="100%" height="600px" style="border: none;"></iframe>
     {% endif %}
 </div>
 {% endblock %}
