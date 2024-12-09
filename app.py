@@ -26,6 +26,17 @@ app.config['SECRET_KEY'] = os.urandom(16)
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 
+bet_options={
+                "team1": "Harvard",
+                "team2": "Yale",
+                "spread1": "-1.5",
+                "spread2": "+1.5",
+                "money1": "-120",
+                "money2": "+120",
+                "total_over": "46.5",
+                "total_under": "46.5",
+            }
+
 # Connects to database 
 def get_db_connection():
     conn = sqlite3.connect('site.db')
@@ -374,7 +385,6 @@ def generate_betting_lines():
             }
             socketio.emit("update_lines", betting_lines)
             time.sleep(1)
-            return betting_lines
     except Exception as e:
         print(f"Error in generate_betting_lines thread: {e}")
 
@@ -409,8 +419,7 @@ def cashout():
     )
     active_bets = cursor.fetchall()
     conn.close()
-    BET_OPTIONS = generate_betting_lines()
-    return render_template("cashout.html", bets=active_bets, BET_OPTIONS=BET_OPTIONS)
+    return render_template("cashout.html", bets=active_bets, BET_OPTIONS=bet_options)
 
 
 @app.route('/process_cashout/<int:bet_id>', methods=["POST"])
