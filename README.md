@@ -15,3 +15,5 @@ Lastly, you have the option to place a bet, which is done on the place bets page
 promote healthy betting, and not spending so much money. The user has the option to enter as much money to bet given the current betting lines. The user also has a drop down menu to select what 
 type of line they want to bet. The bet will then be posted on the view bets tab, which can be viewed by clicking on it. This page has the current moneylines for each type of bet, as well as your
 bet and everyone else's bet, and is updated live. This allows you to see if the community agrees with your bet.
+
+Youtube Link to Demo: https://youtu.be/CjpDRYZStRo
