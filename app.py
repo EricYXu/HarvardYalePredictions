@@ -413,13 +413,19 @@ def generate_betting_lines():
     except Exception as e:
         print(f"Error in generate_betting_lines thread: {e}")
 
+# make it so the fake buy be made so that you can submit form
 @app.route('/eventcontract', methods=["POST"])
 def eventcontract():
     """ Flash bought message"""
     if request.method == "POST":
         contract_count = request.form.get("contract-count")
+
+        # display bought
         flash("Bought " + str(contract_count) + " event contracts!")
+        # return back to landing
         return redirect("/landing")
+    
+    # stay without refreshing
     else:
         return render_template("landing.html")
 
