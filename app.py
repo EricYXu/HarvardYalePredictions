@@ -327,7 +327,7 @@ def place_bet():
         #time.sleep(10)  # Update odds every 10 seconds
 
 # Start the odds updater thread
-Thread(target=update_odds).start()
+#Thread(target=update_odds).start()
 
 def get_match_data(match_id):
     """Fetch match data from the database."""
