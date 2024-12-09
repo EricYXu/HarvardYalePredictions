@@ -377,7 +377,15 @@ def generate_betting_lines():
     except Exception as e:
         print(f"Error in generate_betting_lines thread: {e}")
 
-
+@app.route('/eventcontract', methods=["POST"])
+def eventcontract():
+    """ Flash bought message"""
+    if request.method == "POST":
+        contract_count = request.form.get("contract-count")
+        flash("Bought " + str(contract_count) + " event contracts!")
+        return redirect("/landing")
+    else:
+        return render_template("landing.html")
 
 # Start a background thread to generate betting lines
 threading.Thread(target=generate_betting_lines, daemon=True).start()
