@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}
+Cash Out Bets
+{% endblock %}
+
+{% block main %}
+<div class="container mt-5">
+    <h1 class="text-center">Cash Out Your Bets</h1>
+
+    {% if bets %}
+    <table class="table table-bordered text-center mt-4">
+        <thead>
+            <tr>
+                <th>Bet Option</th>
+                <th>Bet Amount</th>
+                <th>Timestamp</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bet in bets %}
+            <tr>
+                <td>{{ BET_OPTIONS[bet["bet_option"]] }}</td>
+                <td>${{ "%.2f"|format(bet["bet_amount"]) }}</td>
+                <td>{{ bet["timestamp"] }}</td>
+                <td>
+                    <form action="/process_cashout/{{ bet['id'] }}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-warning btn-sm">Cash Out</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="text-center mt-4">You have no active bets to cash out.</p>
+    {% endif %}
+</div>
+{% endblock %}

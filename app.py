@@ -311,23 +311,23 @@ def place_bet():
     return redirect("/live")
 
 
-#def update_odds():
-    #"""Simulate real-time odds updates."""
-    #while True:
+def update_odds():
+    """Simulate real-time odds updates."""
+    while True:
         # Example odds data
-        #new_odds = {
-            #"spread1": "-1.5",
-            #"spread2": "+1.5",
-            #"money1": "-120",
-            #"money2": "+120",
-            #"total": "46.5"
-        #}
+        new_odds = {
+            "spread1": "-1.5",
+            "spread2": "+1.5",
+            "money1": "-120",
+            "money2": "+120",
+            "total": "46.5"
+        }
         # Broadcast the odds to all clients
-        #socketio.emit("odds_update", new_odds, to=None)
-        #time.sleep(10)  # Update odds every 10 seconds
+        socketio.emit("odds_update", new_odds, to=None)
+        time.sleep(10)  # Update odds every 10 seconds
 
 # Start the odds updater thread
-#Thread(target=update_odds).start()
+Thread(target=update_odds).start()
 
 def get_match_data(match_id):
     """Fetch match data from the database."""
@@ -361,40 +361,22 @@ def bets():
 def generate_betting_lines():
     try:
         while True:
-            # Generate a random spread (absolute value between 0.5 and 10.0)
-            spread = round(random.uniform(0.5, 10.0), 1)
-
-            # Generate moneylines such that one is positive and the other is negative
-            money1 = random.randint(-200, -100)  # Negative moneyline for team 1
-            money2 = random.randint(100, 200)   # Positive moneyline for team 2
-
-            # Randomize which team gets the positive moneyline
-            if random.choice([True, False]):
-                money1, money2 = money2, money1
-
-            # Generate a random total (between 40.0 and 60.0)
-            total = round(random.uniform(40.0, 60.0), 1)
-
-            # Emit betting lines where spreads are negatives of each other, and total is the same for both
+            # betting line generation for lines in 2025
             betting_lines = {
                 "team1": "Harvard",
                 "team2": "Yale",
-                "spread1": f"-{spread}",
-                "spread2": f"+{spread}",
-                "money1": f"{money1}",
-                "money2": f"{money2}",
-                "total_over": f"{total}",
-                "total_under": f"{total}",
+                "spread1": "-1.5",
+                "spread2": "+1.5",
+                "money1": "-120",
+                "money2": "+120",
+                "total_over": "46.5",
+                "total_under": "46.5",
             }
-
-            # Send betting lines to all connected clients
             socketio.emit("update_lines", betting_lines)
-
-            # Wait for a second before updating the lines again
             time.sleep(1)
+            return betting_lines
     except Exception as e:
         print(f"Error in generate_betting_lines thread: {e}")
-
 
 @app.route('/eventcontract', methods=["POST"])
 def eventcontract():
@@ -405,6 +387,67 @@ def eventcontract():
         return redirect("/landing")
     else:
         return render_template("landing.html")
+
+@app.route('/cashout', methods=["GET", "POST"])
+def cashout():
+    """
+    Display current bets and allow users to cash out.
+    """
+    if "user_id" not in session:
+        return redirect("/login")
+
+    user_id = session["user_id"]
+
+    conn = sqlite3.connect("site.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    # Fetch all active (non-cashed-out) bets for the user
+    cursor.execute(
+        "SELECT id, bet_option, bet_amount, timestamp FROM bets WHERE user_id = ? AND cashed_out = 0",
+        (user_id,)
+    )
+    active_bets = cursor.fetchall()
+    conn.close()
+    BET_OPTIONS = generate_betting_lines()
+    return render_template("cashout.html", bets=active_bets, BET_OPTIONS=BET_OPTIONS)
+
+
+@app.route('/process_cashout/<int:bet_id>', methods=["POST"])
+def process_cashout(bet_id):
+    """
+    Handle the cash-out process for a specific bet.
+    """
+    if "user_id" not in session:
+        return redirect("/login")
+
+    user_id = session["user_id"]
+
+    conn = sqlite3.connect("site.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    # Fetch the bet and ensure it belongs to the logged-in user
+    cursor.execute("SELECT bet_amount FROM bets WHERE id = ? AND user_id = ? AND cashed_out = 0", (bet_id, user_id))
+    bet = cursor.fetchone()
+
+    if not bet:
+        flash("Bet not found or already cashed out.", "danger")
+        return redirect("/cashout")
+
+    # Calculate the cash-out amount (e.g., 90% of the original bet amount)
+    cash_out_amount = round(bet["bet_amount"] * 0.9, 2)
+
+    # Update the user's balance
+    cursor.execute("UPDATE users SET cash = cash + ? WHERE id = ?", (cash_out_amount, user_id))
+
+    # Mark the bet as cashed out
+    cursor.execute("UPDATE bets SET cashed_out = 1 WHERE id = ?", (bet_id,))
+    conn.commit()
+    conn.close()
+
+    flash(f"Successfully cashed out ${cash_out_amount:.2f}!", "success")
+    return redirect("/cashout")
 
 
 
