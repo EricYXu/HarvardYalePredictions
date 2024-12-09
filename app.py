@@ -26,17 +26,6 @@ app.config['SECRET_KEY'] = os.urandom(16)
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 
-get_options=betting_lines = {
-                "team1": "Harvard",
-                "team2": "Yale",
-                "spread1": "-1.5",
-                "spread2": "+1.5",
-                "money1": "-120",
-                "money2": "+120",
-                "total_over": "46.5",
-                "total_under": "46.5",
-            }
-
 # Connects to database 
 def get_db_connection():
     conn = sqlite3.connect('site.db')
@@ -234,9 +223,10 @@ def scrape_game_stats(url, year):
 
         # scraping logic so we can pull to find the ESPN website for users to see
         stats = []
-        stats_table = soup.find('table', class_='Table')  # Adjust as needed
+        stats_table = soup.find('table', class_='Table') 
         if stats_table:
-            for row in stats_table.find_all('tr')[1:]:  # Skip header row
+            # skip the header row because it doesn't have what we need to query
+            for row in stats_table.find_all('tr')[1:]: 
                 cells = row.find_all('td')
                 stats.append({
                     "Year": year,
@@ -245,6 +235,7 @@ def scrape_game_stats(url, year):
                     "Yale": cells[2].get_text(strip=True),
                 })
         return stats
+    # debugging, can ignore
     except requests.RequestException as e:
         print(f"Error fetching the page for {year}: {e}")
         return []
@@ -258,7 +249,7 @@ def live():
     if "user_id" not in session:
         return redirect("/login")
 
-    # Fetch the user's current balance
+    # get the user's current balance
     user_id = session["user_id"]
     conn = sqlite3.connect("site.db")
     conn.row_factory = sqlite3.Row
@@ -266,7 +257,7 @@ def live():
     cursor.execute("SELECT cash FROM users WHERE id = ?", (user_id,))
     user = cursor.fetchone()
     conn.close()
-
+    # let the user know the cash that they hvae
     return render_template("live.html", user_balance=user["cash"])
 
 
@@ -279,12 +270,15 @@ def handle_odds_update(data):
 @app.route("/add_money", methods=["POST"])
 def add_money():
     """Allow users to add money to their balance."""
+
+    # make sure user is signed in
     if "user_id" not in session:
         return redirect("/login")
 
     user_id = session["user_id"]
     amount = float(request.form.get("amount"))
 
+    # make sure that the amount is valid
     if amount <= 0:
         flash("Please enter a valid amount to add!", "danger")
         return redirect("/live")
@@ -297,6 +291,7 @@ def add_money():
     conn.commit()
     conn.close()
 
+    # tell user how much money is added
     flash(f"Successfully added ${amount:.2f} to your balance!", "success")
     return redirect("/live")
 
@@ -326,7 +321,7 @@ def place_bet():
 
     user_balance = user["cash"]
 
-    # Validate the bet amount
+    # validate the bet amount by making sure it is not over the money user has, and is non negative
     if bet_amount <= 0:
         flash("Bet amount must be greater than 0!", "danger")
         return redirect("/live")
@@ -334,7 +329,7 @@ def place_bet():
         flash("Insufficient balance to place the bet!", "danger")
         return redirect("/live")
 
-    # Deduct the bet amount and log the bet
+    # Subtract out the beg amount
     cursor.execute("UPDATE users SET cash = cash - ? WHERE id = ?", (bet_amount, user_id))
     cursor.execute(
         "INSERT INTO bets (user_id, bet_option, bet_amount) VALUES (?, ?, ?)",
@@ -342,7 +337,8 @@ def place_bet():
     )
     conn.commit()
     conn.close()
-
+    
+    # tell the user that the bet is sucessful
     flash("Bet placed successfully!", "success")
     return redirect("/live")
 
@@ -350,7 +346,7 @@ def place_bet():
 def update_odds():
     """Simulate real-time odds updates."""
     while True:
-        # Example odds data
+        # odds data for next year currently
         new_odds = {
             "spread1": "-1.5",
             "spread2": "+1.5",
@@ -358,11 +354,13 @@ def update_odds():
             "money2": "+120",
             "total": "46.5"
         }
-        # Broadcast the odds to all clients
+        # broadcast the odds to all clients
         socketio.emit("odds_update", new_odds, to=None)
-        time.sleep(10)  # Update odds every 10 seconds
+      
+        # update odds every 10 seconds
+        time.sleep(10)  
 
-# Start the odds updater thread
+# atart the odds updater thread
 Thread(target=update_odds).start()
 
 def get_match_data(match_id):
@@ -389,6 +387,8 @@ def bets():
         "SELECT users.username, bets.bet_option, bets.bet_amount, bets.timestamp "
         "FROM bets JOIN users ON bets.user_id = users.id ORDER BY bets.timestamp DESC"
     )
+
+    # make the bets get all
     all_bets = cursor.fetchall()
     conn.close()
 
