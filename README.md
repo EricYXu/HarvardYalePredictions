@@ -4,8 +4,7 @@ This is the sportsbook for the biggest football game of the year, Harvard vs. Ya
 provides features such as real-time betting lines, user balance tracking, and historical game statistics and utilizes Flask, Socket.IO, SQLite, and Bootstrap for a seamless and interactive 
 user experience.
 
-TLDR:
-How to use our website:
+TLDR How to use our website:
 - type flask run in the terminal under the right directory
 - open the link
 - loaded to front page
