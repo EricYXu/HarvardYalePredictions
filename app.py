@@ -276,6 +276,31 @@ def handle_odds_update(data):
     """Broadcast new odds to all connected clients."""
     emit("odds_update", data, broadcast=True)
 
+@app.route("/add_money", methods=["POST"])
+def add_money():
+    """Allow users to add money to their balance."""
+    if "user_id" not in session:
+        return redirect("/login")
+
+    user_id = session["user_id"]
+    amount = float(request.form.get("amount"))
+
+    if amount <= 0:
+        flash("Please enter a valid amount to add!", "danger")
+        return redirect("/live")
+
+    # Update the user's balance in the database
+    conn = sqlite3.connect("site.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute("UPDATE users SET cash = cash + ? WHERE id = ?", (amount, user_id))
+    conn.commit()
+    conn.close()
+
+    flash(f"Successfully added ${amount:.2f} to your balance!", "success")
+    return redirect("/live")
+
+
 @app.route("/place_bet", methods=["POST"])
 def place_bet():
     """Handle user bet placement."""

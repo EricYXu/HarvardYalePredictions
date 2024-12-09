@@ -8,10 +8,10 @@ Live Betting - Harvard vs Yale
 <div class="container mt-5">
     <h1>Live Betting - Harvard vs Yale</h1>
 
-    <!-- Show user balance -->
+    <!-- show user balance -->
     <p>Your remaining balance: ${{ user_balance }}</p>
 
-    <!-- Betting form -->
+    <!-- betting form -->
     <form action="/place_bet" method="post">
         <div class="row">
             <div class="col-md-6">
@@ -30,7 +30,22 @@ Live Betting - Harvard vs Yale
                 <input type="number" name="bet_amount" id="bet-amount" class="form-control" placeholder="Enter amount" required>
             </div>
         </div>
+        <!-- submit button for placing a bet -->
         <button type="submit" class="btn btn-primary mt-3">Place Bet</button>
+    </form>
+
+    <!-- add money form so user has more money -->
+    <hr class="mt-5">
+    <h2>Add Money to Your Balance</h2>
+    <form action="/add_money" method="post">
+        <div class="row">
+            <div class="col-md-6">
+                <label for="add-amount" class="form-label">Amount to Add</label>
+                <input type="number" name="amount" id="add-amount" class="form-control" placeholder="Enter amount" required>
+            </div>
+        </div>
+        <!-- submit button for adding money -->
+        <button type="submit" class="btn btn-success mt-3">Add Money</button>
     </form>
 </div>
 {% endblock %}

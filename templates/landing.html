@@ -13,7 +13,7 @@ Landing
         </div>
     </div>
 
-    <!-- Countdown Timer -->
+    <!-- Create A Countdown Timer -->
     <div class="row mt-4">
         <div class="col">
             <h3>Countdown to Harvard-Yale Game 2025:</h3>
@@ -24,6 +24,7 @@ Landing
         </div>
     </div>
 
+    <!-- Give the user a nice welcome image, showing them their money -->
     <div class="row mt-5">
         <div class="col">
             <div class="card" style="width: 18rem;">
@@ -34,6 +35,7 @@ Landing
                 </div>
             </div>
         </div>
+        <!-- Create the right side with practice events for people to play with-->
         <div class="col">
             <h3 class="centered">Practice: Event Contract Markets</h3>
             <div class="row">
@@ -104,32 +106,34 @@ Landing
     </div>
 </div>
 
-<!-- Countdown Timer Script -->
+<!-- Countdown Timer Creating Logic -->
 <script>
-    // Target date for countdown (Nov 22, 2025)
+    // This is our Target date for the countdown 
     const countdownDate = new Date("November 22, 2025 00:00:00").getTime();
 
+    // create a new function, that has a time update, and find the date and time of today
     function updateCountdown() {
+        // this function is from chatGPT to guide us to find the time at this very moment
         const now = new Date().getTime();
         const timeLeft = countdownDate - now;
 
-        // Calculate days, hours, and minutes remaining
+        // calculate days, hours, and minutes remaining
         const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
         const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
 
-        // Display the result in the countdown element
+        // display the result in the countdown element
         document.getElementById("countdown-timer").innerHTML = 
             `${days} Days, ${hours} Hours, ${minutes} Minutes`;
 
-        // If the countdown is complete
+        // if the countdown is complete display its game day
         if (timeLeft < 0) {
             clearInterval(countdownInterval);
             document.getElementById("countdown-timer").innerHTML = "It's Game Day!";
         }
     }
 
-    // Update countdown immediately and every 60 seconds
+    // update countdown immediately and every 60 seconds as a minute passes, but this requires miliminutes, so use 60,000
     updateCountdown();
     const countdownInterval = setInterval(updateCountdown, 60000); // Every minute
 </script>
