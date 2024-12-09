@@ -26,7 +26,7 @@ app.config['SECRET_KEY'] = os.urandom(16)
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 
-bet_options={
+get_options=betting_lines = {
                 "team1": "Harvard",
                 "team2": "Yale",
                 "spread1": "-1.5",
@@ -397,67 +397,6 @@ def eventcontract():
         return redirect("/landing")
     else:
         return render_template("landing.html")
-
-@app.route('/cashout', methods=["GET", "POST"])
-def cashout():
-    """
-    Display current bets and allow users to cash out.
-    """
-    if "user_id" not in session:
-        return redirect("/login")
-
-    user_id = session["user_id"]
-
-    conn = sqlite3.connect("site.db")
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-
-    # Fetch all active (non-cashed-out) bets for the user
-    cursor.execute(
-        "SELECT id, bet_option, bet_amount, timestamp FROM bets WHERE user_id = ? AND cashed_out = 0",
-        (user_id,)
-    )
-    active_bets = cursor.fetchall()
-    conn.close()
-    return render_template("cashout.html", bets=active_bets, BET_OPTIONS=bet_options)
-
-
-@app.route('/process_cashout/<int:bet_id>', methods=["POST"])
-def process_cashout(bet_id):
-    """
-    Handle the cash-out process for a specific bet.
-    """
-    if "user_id" not in session:
-        return redirect("/login")
-
-    user_id = session["user_id"]
-
-    conn = sqlite3.connect("site.db")
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-
-    # Fetch the bet and ensure it belongs to the logged-in user
-    cursor.execute("SELECT bet_amount FROM bets WHERE id = ? AND user_id = ? AND cashed_out = 0", (bet_id, user_id))
-    bet = cursor.fetchone()
-
-    if not bet:
-        flash("Bet not found or already cashed out.", "danger")
-        return redirect("/cashout")
-
-    # Calculate the cash-out amount (e.g., 90% of the original bet amount)
-    cash_out_amount = round(bet["bet_amount"] * 0.9, 2)
-
-    # Update the user's balance
-    cursor.execute("UPDATE users SET cash = cash + ? WHERE id = ?", (cash_out_amount, user_id))
-
-    # Mark the bet as cashed out
-    cursor.execute("UPDATE bets SET cashed_out = 1 WHERE id = ?", (bet_id,))
-    conn.commit()
-    conn.close()
-
-    flash(f"Successfully cashed out ${cash_out_amount:.2f}!", "success")
-    return redirect("/cashout")
-
 
 
 # Start a background thread to generate betting lines
