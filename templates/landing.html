@@ -5,7 +5,7 @@ Landing
 {% endblock %}
 
 {% block main %}
-<div class="container-fluid image-intro px-4 text-center">
+<div class="container-fluid image-intro px-4 text-center" style="font-family: 'Comic Sans MS', cursive, sans-serif;">
     <div class="row">
         <div class="col image-intro">
             <h1>Harvard-Yale Sportsbook Personal Dashboard</h1>
@@ -14,14 +14,16 @@ Landing
     </div>
 
     <!-- Countdown Timer -->
-    <div class="row">
+    <div class="row mt-4">
         <div class="col">
             <h3>Countdown to Harvard-Yale Game 2025:</h3>
-            <h2 id="countdown-timer" class="display-5 text-primary"></h2>
+            <div id="countdown-box" class="mx-auto p-3 rounded shadow" style="max-width: 300px; background-color: #f8f9fa; border: 2px solid #343a40;">
+                <h2 id="countdown-timer" class="display-5 text-primary"></h2>
+            </div>
         </div>
     </div>
 
-    <div class="row">
+    <div class="row mt-5">
         <div class="col">
             <div class="card" style="width: 18rem;">
                 <img class="card-img-top" src="./static/red_football.jpg" alt="Football_player_wearing_red">
